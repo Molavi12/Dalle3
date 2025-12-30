@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تولید عکس با هوش مصنوعی</title>
+    <style>
+        body {
+            font-family: Tahoma, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        #result {
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            margin-top: 20px;
+            display: none; /* در ابتدا مخفی است */
+        }
+        .loading {
+            font-size: 1.5em;
+            color: #333;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>تولیدگر تصویر هوش مصنوعی</h1>
+    <p id="status">لطفا صبر کنید...</p>
+    
+    <!-- جایی که عکس نمایش داده می‌شود -->
+    <img id="result" alt="تصویر تولید شده">
+
+    <script>
+        // 1. دریافت پارامترهای URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const prompt = urlParams.get('prompt');
+
+        const imgElement = document.getElementById('result');
+        const statusElement = document.getElementById('status');
+
+        if (prompt) {
+            // 2. رمزگذاری متن برای استفاده در URL
+            const encodedPrompt = encodeURIComponent(prompt);
+            
+            // 3. ساخت آدرس API از Pollinations.ai
+            // این سرویس رایگان است و نیازی به کلید ندارد
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}`;
+
+            // 4. تنظیم رویداد بارگذاری عکس
+            imgElement.onload = function() {
+                imgElement.style.display = 'block';
+                statusElement.style.display = 'none';
+            };
+
+            imgElement.onerror = function() {
+                statusElement.innerHTML = '<span class="error">خطایی در تولید عکس رخ داد.</span>';
+            };
+
+            // 5. شروع فرآیند بارگذاری
+            imgElement.src = imageUrl;
+            statusElement.innerText = `در حال تولید عکس برای: "${prompt}"`;
+
+        } else {
+            statusElement.innerHTML = `
+                <span class="error">لطفاً یک پرامپت (متن) وارد کنید.</span><br>
+                مثال: <br>
+                <code>?prompt=a cyberpunk cat</code>
+            `;
+        }
+    </script>
+
+</body>
+</html>
